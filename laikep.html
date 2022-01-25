@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+</head>
+
+<body class="container">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="money" class="form-label">Số tiền ban đầu</label>
+                <input onchange="main()" type="text" data-type="currency" class="form-control" id="money"
+                    value="4,000,000">
+            </div>
+            <div class="mb-3">
+                <label for="year" class="form-label">Số năm đầu tư</label>
+                <input onchange="main()" type="number" class="form-control" id="year" value="30">
+            </div>
+            <div class="mb-3">
+                <label for="moneyMonthly" class="form-label">Số tiền bỏ vào mỗi tháng</label>
+                <input onchange="main()" type="text" class="form-control" id="moneyMonthly" value="1,000,000">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="rate" class="form-label">Lãi suất hằng năm(%)</label>
+                <input onchange="main()" type="number" class="form-control" id="rate" value="12">
+            </div>
+            <div class="mb-3">
+                <label for="age" class="form-label">Độ tuổi bắt đầu tiết kiệm</label>
+                <input onchange="main()" type="text" class="form-control" id="age" value="20">
+            </div>
+            <div class="mb-3">
+                <label for="lowrate" class="form-label">Lạm phát hằng năm(%)</label>
+                <input onchange="main()" type="number" class="form-control" id="lowrate" value="4">
+            </div>
+        </div>
+        <canvas id="doThi"></canvas>
+    </div>
+    <script>
+        
+        function numberRange(start, end) {
+            return new Array(end - start).fill().map((d, i) => i + start);
+        }
+        Chart.defaults.font.size = 18;
+        let myChart = new Chart(
+            document.getElementById('doThi'),
+            {
+                type: 'line',
+                data: {
+                    labels: numberRange(parseInt($("#age").val()),100),
+                    datasets: [{
+                        label: 'Tài sản trong tương lai',
+                        backgroundColor: 'rgb(255, 0, 132)',
+                        borderColor: 'rgb(255, 0, 132)',
+                        data: [],
+                    },
+                    {
+                        label: 'Giá trị thực tế trừ lạm phát',
+                        backgroundColor: 'rgb(19, 15, 64)',
+                        borderColor: 'rgb(19, 15, 64)',
+                        data: [],
+                    }]
+                },
+                options: {}
+            }
+        );
+        main();
+        function main() {
+            let tienBanDau = parseInt($("#money").val().replace(/,/g, ""));
+            let soNam = parseInt($("#year").val());
+            let tienDauTuThang = parseInt($("#moneyMonthly").val().replace(/,/g, ""));
+            let laiSuat = parseFloat($("#rate").val());
+            let tuoi = parseInt($("#age").val());
+            let lamPhat = parseFloat($("#lowrate").val());
+            let labels = [];
+            let arrMoney = [];
+            let arrMoneyLP = [];
+            let tienBanDauLP = tienBanDau;
+            for (let i = tuoi; i <= tuoi + soNam; i++) {
+                labels.push(`${i}`);
+                arrMoney.push(tienBanDau);
+                arrMoneyLP.push(tienBanDauLP);
+                tienBanDauLP= Math.round(tienBanDauLP * (1 + (laiSuat-lamPhat) / 100) + (tienDauTuThang * 12));
+                tienBanDau = Math.round(tienBanDau * (1 + (laiSuat) / 100) + (tienDauTuThang * 12));
+            }
+            myChart.data.labels = labels;
+            myChart.data.datasets[0].data = arrMoney;
+            myChart.data.datasets[1].data = arrMoneyLP;
+            myChart.update();
+        }
+        function removeData(chart) {
+            chart.data.labels.pop();
+            chart.data.datasets.forEach((dataset) => {
+                dataset.data.pop();
+            });
+            chart.update();
+        }
+    </script>
+    <script>
+
+        $("input[data-type='currency']").on({
+            keyup: function () {
+                formatCurrency($(this));
+            },
+            blur: function () {
+                formatCurrency($(this), "blur");
+            }
+        });
+
+
+        function formatNumber(n) {
+            // format number 1000000 to 1,234,567
+            return n.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+        }
+
+
+        function formatCurrency(input, blur) {
+            // appends $ to value, validates decimal side
+            // and puts cursor back in right position.
+
+            // get input value
+            var input_val = input.val();
+
+            // don't validate empty input
+            if (input_val === "") { return; }
+
+            // original length
+            var original_len = input_val.length;
+
+            // initial caret position 
+            var caret_pos = input.prop("selectionStart");
+
+            // check for decimal
+            if (input_val.indexOf(".") >= 0) {
+
+                // get position of first decimal
+                // this prevents multiple decimals from
+                // being entered
+                var decimal_pos = input_val.indexOf(".");
+
+                // split number by decimal point
+                var left_side = input_val.substring(0, decimal_pos);
+                var right_side = input_val.substring(decimal_pos);
+
+                // add commas to left side of number
+                left_side = formatNumber(left_side);
+
+                // validate right side
+                right_side = formatNumber(right_side);
+
+                // On blur make sure 2 numbers after decimal
+                if (blur === "blur") {
+                    right_side += "00";
+                }
+
+                // Limit decimal to only 2 digits
+                right_side = right_side.substring(0, 2);
+
+                // join number by .
+                input_val = left_side;
+
+            } else {
+                // no decimal entered
+                // add commas to number
+                // remove all non-digits
+                input_val = formatNumber(input_val);
+                input_val = input_val;
+
+
+            }
+
+            // send updated string to input
+            input.val(input_val);
+
+            // put caret back in the right position
+            var updated_len = input_val.length;
+            caret_pos = updated_len - original_len + caret_pos;
+            input[0].setSelectionRange(caret_pos, caret_pos);
+        }
+
+
+
+    </script>
+
+</body>
+
+</html>
