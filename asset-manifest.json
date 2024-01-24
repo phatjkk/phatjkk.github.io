@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "./static/css/main.72688fa7.css",
-    "main.js": "./static/js/main.b1f1fec2.js",
-    "static/media/2.mp3": "./static/media/2.8306adc12e19dcfa3d24.mp3",
+    "main.js": "./static/js/main.ed2efaa1.js",
+    "static/media/2.mp3": "./static/media/2.bf14ce56e9d4c54e561f.mp3",
     "static/media/toothless.gif": "./static/media/toothless.fc9cac9a0e1ef5594f3c.gif",
     "static/media/image.jpg": "./static/media/image.17ff8e04d9829638fc27.jpg",
     "static/media/playing.gif": "./static/media/playing.c7e64acd3039a22ab5fa.gif",
@@ -13,10 +13,10 @@
     "static/media/slick.woff": "./static/media/slick.295183786cd8a1389865.woff",
     "index.html": "./index.html",
     "main.72688fa7.css.map": "./static/css/main.72688fa7.css.map",
-    "main.b1f1fec2.js.map": "./static/js/main.b1f1fec2.js.map"
+    "main.ed2efaa1.js.map": "./static/js/main.ed2efaa1.js.map"
   },
   "entrypoints": [
     "static/css/main.72688fa7.css",
-    "static/js/main.b1f1fec2.js"
+    "static/js/main.ed2efaa1.js"
   ]
 }
