@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -23,25 +24,25 @@
             <div class="mb-3">
                 <label for="money" class="form-label">Số tiền ban đầu</label>
                 <input onchange="main()" type="text" data-type="currency" class="form-control" id="money"
-                    value="4,000,000">
+                    value="100000">
             </div>
             <div class="mb-3">
                 <label for="year" class="form-label">Số năm đầu tư</label>
-                <input onchange="main()" type="number" class="form-control" id="year" value="30">
+                <input onchange="main()" type="number" class="form-control" id="year" value="15">
             </div>
             <div class="mb-3">
                 <label for="moneyMonthly" class="form-label">Số tiền bỏ vào mỗi tháng</label>
-                <input onchange="main()" type="text" class="form-control" id="moneyMonthly" value="1,000,000">
+                <input onchange="main()" type="text" class="form-control" id="moneyMonthly" value="100">
             </div>
         </div>
         <div class="col-md-6">
             <div class="mb-3">
                 <label for="rate" class="form-label">Lãi suất hằng năm(%)</label>
-                <input onchange="main()" type="number" class="form-control" id="rate" value="12">
+                <input onchange="main()" type="number" class="form-control" id="rate" value="7">
             </div>
             <div class="mb-3">
                 <label for="age" class="form-label">Độ tuổi bắt đầu tiết kiệm</label>
-                <input onchange="main()" type="text" class="form-control" id="age" value="20">
+                <input onchange="main()" type="text" class="form-control" id="age" value="23">
             </div>
             <div class="mb-3">
                 <label for="lowrate" class="form-label">Lạm phát hằng năm(%)</label>
@@ -90,13 +91,21 @@
             let arrMoney = [];
             let arrMoneyLP = [];
             let tienBanDauLP = tienBanDau;
+            let thang = 0
+            laiSuat = laiSuat /100
+            lamPhat = lamPhat / 100
+            let tienHangNam = tienBanDau;
+            let tienHangNamLamPhat = tienBanDau;
+            let laiTruLamPhat = laiSuat - lamPhat
             for (let i = tuoi; i <= tuoi + soNam; i++) {
-                labels.push(`${i}`);
-                arrMoney.push(tienBanDau);
-                arrMoneyLP.push(tienBanDauLP);
-                tienBanDauLP= Math.round(tienBanDauLP * (1 + (laiSuat-lamPhat) / 100) + (tienDauTuThang * 12));
-                tienBanDau = Math.round(tienBanDau * (1 + (laiSuat) / 100) + (tienDauTuThang * 12));
+            labels.push(`${i}`);
+              thang += 12
+              arrMoney.push(Math.round(tienHangNam));
+              arrMoneyLP.push(Math.round(tienHangNamLamPhat));
+               tienHangNam = tienBanDau*Math.pow(1+laiSuat/12,thang) + tienDauTuThang*(Math.pow(1+laiSuat/12,thang)-1)/(laiSuat/12)
+            tienHangNamLamPhat = tienBanDau*Math.pow(1+laiTruLamPhat/12,thang) + tienDauTuThang*(Math.pow(1+laiTruLamPhat/12,thang)-1)/(laiTruLamPhat/12)
             }
+            console.log(arrMoney)
             myChart.data.labels = labels;
             myChart.data.datasets[0].data = arrMoney;
             myChart.data.datasets[1].data = arrMoneyLP;
